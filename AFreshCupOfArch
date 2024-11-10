@@ -29,6 +29,37 @@ print_intro() {
     sleep 2
 }
 
+get_system_info() {
+    echo "Getting system info..."
+    # Detect hardware model and UEFI mode
+    hardware_model=$(dmidecode -s system-manufacturer)
+    product_name=$(dmidecode -s system-product-name)
+    uefi_mode=$(dmesg | grep -i 'EFI v' > /dev/null && echo "true" || echo "false")
+
+    # Detect processor model
+    processor_model=$(lscpu | grep 'Model name' | sed 's/Model name:\s*//')
+
+    # Memory statistics
+    memory_total=$(grep MemTotal /proc/meminfo | awk '{print $2}')
+    memory_available=$(grep MemAvailable /proc/meminfo | awk '{print $2}')
+    memory_total_mb=$((memory_total / 1024))
+    memory_available_mb=$((memory_available / 1024))
+
+    # Detect virtualization platform and whether it's a VM
+    virtualization_platform=$(systemd-detect-virt)
+    is_vm=$(if [[ $virtualization_platform != "none" ]]; then echo "true"; else echo "false"; fi)
+
+    # Detect graphics device
+    graphics_device=$(lspci | grep -i 'vga' | sed -n 's/.*: \(.*\)/\1/p')
+
+    # Output and log system info
+    echo "Hardware model detected: $hardware_model $product_name; UEFI mode: $uefi_mode"
+    echo "Processor model detected: $processor_model"
+    echo "Memory statistics: ${memory_available_mb}MB available out of ${memory_total_mb}MB total installed"
+    echo "Virtualization detected: $virtualization_platform; is VM: $is_vm"
+    echo "Graphics devices detected: dict_keys(['$graphics_device'])"
+}
+
 main() {
     print_intro
     #get_system_info
