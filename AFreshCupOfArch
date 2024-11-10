@@ -1,0 +1,52 @@
+#!/bin/bash
+
+set -euo pipefail
+
+# Get the absolute path of the project root
+PROJECT_ROOT=$(realpath "$(dirname "$0")")
+
+print_intro() {
+    clear
+    echo "============================================================================"
+    echo "               _             _       _     _                                "
+    echo "              / \   _ __ ___| |__   | |   (_)_ __  _   ___  __              "
+    echo "             / _ \ | '__/ __| '_ \  | |   | | '_ \| | | \ \/ /              "
+    echo "            / ___ \| | | (__| | | | | |___| | | | | |_| |>  <               "
+    echo "           /_/   \_\_|  \___|_| |_| |_____|_|_| |_|\__,_/_/\_\              "
+    echo "            ____                   ___           _        _ _               "
+    echo "           | __ )  __ _ ___  ___  |_ _|_ __  ___| |_ __ _| | |              "
+    echo "           |  _ \ / _  / __|/ _ \  | || '_ \/ __| __/ _  | | |              "
+    echo "           | |_) | (_| \__ \  __/  | || | | \__ \ || (_| | | |              "
+    echo "           |____/ \__,_|___/\___| |___|_| |_|___/\__\__,_|_|_|              "
+    echo "                                                                            "
+    echo "============================================================================"
+    echo ""
+    echo "          This script will install Arch Linux with LVM and LUKS             "
+    echo ""
+    echo "============================================================================"
+    echo ""
+    echo ""
+    sleep 2
+}
+
+main() {
+    print_intro
+    #get_system_info
+    #check_required_vars
+    #check_connectivity
+    #set_ntp
+    #configure_mirrors
+    #check_mirrorlist_updated
+    #show_mountpoints
+    #get_install_disk
+    #is_disk_encrypted_or_lvm
+    #partition_disk
+    #setup_luks_and_lvm
+    #create_logical_volumes
+    #format_logical_volumes
+    #mount_filesystems
+}
+
+main
+
+
