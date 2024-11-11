@@ -27,7 +27,7 @@ print_intro() {
     echo "============================================================================"
     echo ""
     echo ""
-    sleep 2
+#    sleep 2
 }
 
 get_system_info() {
@@ -315,7 +315,7 @@ configure_mirrors() {
     echo "Configuring mirrors..."
 
     # Check to see if reflector is installed
-    if ! pacman -Qs reflector > /dev/null; then
+    if ! which reflector > /dev/null; then
         echo "Installing reflector"
         pacman -Sy --noconfirm reflector
     fi
