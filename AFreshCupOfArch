@@ -370,6 +370,25 @@ get_install_disk() {
     fi
 }
 
+is_disk_encrypted_or_lvm() {
+    echo "Checking to see if the disk is encrypted or has LVM..."
+    # Check if the disk contains LVM data or is encrypted
+    if pvs "$DISK" &>/dev/null || cryptsetup isLuks "$DISK" &>/dev/null; then
+        echo "Warning: The disk $DISK contains LVM data or is encrypted."
+        lsblk -o NAME,SIZE,TYPE,FSTYPE,MOUNTPOINT "$DISK"
+
+        # Prompt the user to quit or continue (default to quit)
+        read -p "The disk contains LVM or encrypted data. Do you want to continue? [y/N]: " response
+        response=${response,,}  # Convert to lowercase
+        if [[ "$response" != "y" ]]; then
+            echo "User cancelled the installation."
+            exit 1
+        else
+            echo "User selected continue."
+        fi
+    fi
+}
+
 main() {
     clear
     print_intro
@@ -381,7 +400,7 @@ main() {
     check_mirrorlist_updated
     show_mountpoints
     get_install_disk
-    #is_disk_encrypted_or_lvm
+    is_disk_encrypted_or_lvm
     #partition_disk
     #setup_luks_and_lvm
     #create_logical_volumes
