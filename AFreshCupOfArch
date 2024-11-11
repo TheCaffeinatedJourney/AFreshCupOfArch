@@ -299,16 +299,28 @@ check_connectivity() {
     fi
 }
 
+set_ntp() {
+    echo "Setting NTP..."
+    timedatectl set-ntp true
+    if timedatectl show | grep -q "NTPSynchronized=yes"; then
+        echo "NTP is successfully synchronized."
+        return 0
+    else
+        echo "Warning: Unable to synchronize NTP."
+        return 1
+    fi
+}
+
 
 main() {
     clear
     print_intro
     get_system_info
     set_required_vars
-    #set_ntp
     #configure_mirrors
     #check_mirrorlist_updated
     check_connectivity
+    set_ntp
     #show_mountpoints
     #get_install_disk
     #is_disk_encrypted_or_lvm
