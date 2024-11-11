@@ -389,6 +389,22 @@ is_disk_encrypted_or_lvm() {
     fi
 }
 
+partition_disk() {
+    echo "Creating partitions on $DISK..."
+    sgdisk -Z "$DISK" -n 1:0:+512M -t 1:ef00 -c 1:ESP -n 2:0:0 -t 2:8e00 -c 2:LinuxLVM
+
+    partprobe "$DISK"
+
+    # Get the names of the first and second partitions
+    part1=$(lsblk -lnpo NAME "${DISK}" | sed -n '2p')  # First partition
+    part2=$(lsblk -lnpo NAME "${DISK}" | sed -n '3p')  # Second partition
+
+    echo "Partitions $part1 and $part2 created on $DISK."
+
+    ESP_PARTITION="$part1"
+    LVM_PARTITION="$part2"
+}
+
 main() {
     clear
     print_intro
@@ -401,7 +417,7 @@ main() {
     show_mountpoints
     get_install_disk
     is_disk_encrypted_or_lvm
-    #partition_disk
+    partition_disk
     #setup_luks_and_lvm
     #create_logical_volumes
     #format_logical_volumes
