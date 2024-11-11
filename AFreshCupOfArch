@@ -373,9 +373,9 @@ get_install_disk() {
 is_disk_encrypted_or_lvm() {
     echo "Checking to see if the disk is encrypted or has LVM..."
     # Check if the disk contains LVM data or is encrypted
-    if pvs "$DISK" &>/dev/null || cryptsetup isLuks "$DISK" &>/dev/null; then
-        echo "Warning: The disk $DISK contains LVM data or is encrypted."
-        lsblk -o NAME,SIZE,TYPE,FSTYPE,MOUNTPOINT "$DISK"
+    if pvs "$disk" &>/dev/null || cryptsetup isLuks "$disk" &>/dev/null; then
+        echo "Warning: The disk $disk contains LVM data or is encrypted."
+        lsblk -o NAME,SIZE,TYPE,FSTYPE,MOUNTPOINT "$disk"
 
         # Prompt the user to quit or continue (default to quit)
         read -p "The disk contains LVM or encrypted data. Do you want to continue? [y/N]: " response
@@ -390,16 +390,16 @@ is_disk_encrypted_or_lvm() {
 }
 
 partition_disk() {
-    echo "Creating partitions on $DISK..."
-    sgdisk -Z "$DISK" -n 1:0:+512M -t 1:ef00 -c 1:ESP -n 2:0:0 -t 2:8e00 -c 2:LinuxLVM
+    echo "Creating partitions on $disk..."
+    sgdisk -Z "$disk" -n 1:0:+512M -t 1:ef00 -c 1:ESP -n 2:0:0 -t 2:8e00 -c 2:LinuxLVM
 
-    partprobe "$DISK"
+    partprobe "$disk"
 
     # Get the names of the first and second partitions
-    part1=$(lsblk -lnpo NAME "${DISK}" | sed -n '2p')  # First partition
-    part2=$(lsblk -lnpo NAME "${DISK}" | sed -n '3p')  # Second partition
+    part1=$(lsblk -lnpo NAME "${disk}" | sed -n '2p')  # First partition
+    part2=$(lsblk -lnpo NAME "${disk}" | sed -n '3p')  # Second partition
 
-    echo "Partitions $part1 and $part2 created on $DISK."
+    echo "Partitions $part1 and $part2 created on $disk."
 
     ESP_PARTITION="$part1"
     LVM_PARTITION="$part2"
