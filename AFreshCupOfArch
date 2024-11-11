@@ -348,6 +348,27 @@ check_mirrorlist_updated() {
     return 1
 }
 
+show_mountpoints() {
+    #Show mountpoints
+    lsblk -o NAME,SIZE,TYPE,MOUNTPOINT
+}
+
+get_install_disk() {
+    read -p "Enter the disk to partition (e.g., /dev/sda or sda): " disk
+
+    # Check if the user entered a device name without '/dev/' and prepend it
+    if [[ ! "$disk" =~ ^/dev/ ]]; then
+        disk="/dev/$disk"
+    fi
+
+    echo "User selected $disk"
+
+    # Validate that the entered device is a valid block device
+    if [[ ! -b "$disk" ]]; then
+        echo "Error: $disk is not a valid block device."
+        exit 1
+    fi
+}
 
 main() {
     clear
@@ -358,15 +379,14 @@ main() {
     set_ntp
     configure_mirrors
     check_mirrorlist_updated
-    #show_mountpoints
-    #get_install_disk
+    show_mountpoints
+    get_install_disk
     #is_disk_encrypted_or_lvm
     #partition_disk
     #setup_luks_and_lvm
     #create_logical_volumes
     #format_logical_volumes
     #mount_filesystems
-    echo "Success!??!"
 }
 
 main
