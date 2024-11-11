@@ -3,7 +3,8 @@
 set -euo pipefail
 
 # Get the absolute path of the project root
-PROJECT_ROOT=$(realpath "$(dirname "$0")")
+project_root=$(realpath "$(dirname "$0")")
+config_file="$project_root/install.conf"
 
 print_intro() {
     clear
@@ -60,10 +61,236 @@ get_system_info() {
     echo "Graphics devices detected: dict_keys(['$graphics_device'])"
 }
 
+# Function to check for variables that need validation
+set_required_vars() {
+    # List of required variables with their descriptions
+    local required_vars=(
+        "physical_volume:Physical Volume Label"
+        "volume_group:Volume Group Label"
+        "disable_root:Disable root Account"
+        "root_secret:Password for root account"
+        "luks_secret:Password for LUKS"
+        "user_name:New User Name"
+        "user_secret:Password for New User"
+        "hostname:Hostname"
+        "default_kernel:Default Kernel"
+    )
+
+    # Source the configuration file
+    source "$config_file"
+   # Declare an associative array to hold the current values
+    declare -A current_values
+    local undefined_vars=()
+    local is_password
+
+    echo ""
+    echo "Checking config for variable preset values:"
+
+    # Check if variables are defined and prepare output
+for var in "${required_vars[@]}"; do
+    IFS=":" read -r var_name description <<< "$var"
+
+    # Check for passwords by identifying "_secret" suffix
+    if [[ "$var_name" == *_secret ]]; then
+        is_password=1
+    else
+        is_password=0
+    fi
+    
+    # Check if variable is defined
+    if [[ -n "${!var_name:-}" ]]; then
+        current_values["$var_name"]="${!var_name}"
+        # Debug: Show the current value or indicate it's a password
+        if [[ "$is_password" -eq 1 ]]; then
+            echo "$description ($var_name) = ********"
+        else
+            echo "$description ($var_name) = ${current_values[$var_name]}"
+        fi
+    else
+        undefined_vars+=("$var_name")
+    fi
+done
+
+
+    # If there are undefined variables, prompt the user for input
+    if ((${#undefined_vars[@]} > 0)); then
+        for var in "${undefined_vars[@]}"; do
+            case "$var" in
+                *_secret)
+                    prompt_password "$var"
+                    ;;
+                "disable_root")
+                    prompt_boolean "$var"
+                    ;;
+                "default_kernel")
+                    prompt_kernel "$var"
+                    ;;
+                *)
+                    read -rp "Please enter a value for $var: " value
+                    current_values["$var"]="$value"
+                    ;;
+            esac
+        done
+    fi
+
+# In the `else` block, prompt for other undefined variables
+if confirm_proceed; then
+    echo "Proceeding with current values..."
+else
+    # Prompt to update only defined values
+    for var in "${!current_values[@]}"; do
+        local current="${current_values[$var]:-}"
+        case "$var" in
+            *_secret)
+                prompt_password "$var"
+                ;;
+            "disable_root")
+                prompt_boolean "$var"
+                ;;
+            "default_kernel")
+                prompt_kernel "$var"
+                ;;
+            *)
+                if [[ -n "$current" ]]; then
+                    read -rp "Please enter a new value for $var (current: ${current_values[$var]}): " value
+                else
+                    read -rp "Please enter a value for $var:" value
+                fi
+                current_values["$var"]="${value:-${current_values[$var]}}"
+                ;;
+        esac
+    done
+fi
+}
+
+# Function to print the current values
+print_current_values() {
+    echo "Current values:"
+    for var in "${required_vars[@]}"; do
+        IFS=":" read -r var_name description <<< "$var"
+
+        # Check if the variable name is a password to print appropriately
+        if [[ "$var_name" == *_secret ]]; then
+            echo "$description ($var_name) = ********"
+        else
+            echo "$description ($var_name) = ${current_values[$var_name]:-Not defined}"
+        fi
+    done
+}
+
+# Function to confirm if the user wants to proceed
+confirm_proceed() {
+    while true; do
+        read -rp "Do you want to proceed with these values? (yes/no): " proceed
+        case "${proceed,,}" in  # Convert input to lowercase for matching
+            y|yes) return 0 ;;   # Return 0 for success (proceed)
+            n|no) return 1 ;;    # Return 1 for failure (do not proceed)
+            *) echo "Invalid input. Please enter 'yes' or 'no'." ;;
+        esac
+    done
+}
+
+# Function to prompt for password variables
+prompt_password() {
+    local var="$1"
+    local current="${current_values[$var]:-}"
+
+    while true; do
+        if [[ -n "$current" ]]; then
+            echo "Current value for $var is set. Enter a new value to change it."
+        fi
+        read -rsp "Please enter a value for $var: " value
+        echo
+        read -rsp "Please confirm the value for $var: " value_confirm
+        echo
+        if [[ "$value" == "$value_confirm" ]]; then
+            current_values["$var"]="$value"
+            break
+        else
+            echo "Passwords do not match. Please try again."
+        fi
+    done
+}
+
+# Function to prompt for boolean variables (like disable_root)
+prompt_boolean() {
+    local var="$1"
+    local current="${current_values[$var]:-}"
+    while true; do
+        if [[ -n "$current" ]]; then
+            echo "Current value for $var: $current. Enter a new value to change it."
+        fi
+        read -rp "Please enter a value for $var (true/false): " value
+        if [[ "$value" == "true" || "$value" == "false" ]]; then
+            current_values["$var"]="$value"
+            break
+        else
+            echo "Invalid input for $var. It must be true or false."
+        fi
+    done
+}
+
+# Function to prompt for valid Arch Linux kernels
+prompt_kernel() {
+    local var="$1"
+    local current="${current_values[$var]:-}"
+    while true; do
+        if [[ -n "$current" ]]; then
+            echo "Current value for $var: $current. Enter a new value to change it."
+        fi
+        read -rp "Please enter a value for $var: " value
+        if validate_kernel "$value"; then
+            current_values["$var"]="$value"
+            break
+        else
+            echo "Invalid kernel name. Please enter a valid kernel available in the Arch Linux repository."
+        fi
+    done
+}
+
+# Function to validate if a given kernel name is a valid Arch Linux kernel
+validate_kernel() {
+    local kernel_name="$1"
+
+    case "$kernel_name" in
+        "linux" | "linux-lts" | "linux-rt" | "linux-hardened" | "linux-zen")
+            return 0  # Valid kernel
+            ;;
+        *)
+            echo "Error: $kernel_name is not a valid kernel. Choose from: linux, linux-lts, linux-rt, linux-hardened, or linux-zen."
+            return 1  # Not a valid kernel
+            ;;
+    esac
+}
+
+# Update or create a configuration variable
+update_config() {
+    local config_var="$1"
+    local new_value="$2"
+
+    # Escape special characters for sed
+    local escaped_value
+    escaped_value=$(printf '%s\n' "$new_value" | sed -e 's/[\/&]/\\&/g')
+
+    # Check if the config variable exists in the config_file file
+    if grep -q "^$config_var=" "$config_file"; then
+        # Update the existing config variable with the unescaped new value
+        sed -i "s|^$config_var=.*|$config_var=\"$escaped_value\"|" "$config_file"
+        echo "Updated $config_var to $new_value in $config_file"
+    else
+        # Add the config variable with the new value to the end of the file
+        echo "$config_var=\"$new_value\"" >> "$config_file"
+        echo "Added $config_var with value $new_value to $config_file"
+    fi
+}
+
+
+
 main() {
+    clear
     print_intro
-    #get_system_info
-    #check_required_vars
+    get_system_info
+    set_required_vars
     #check_connectivity
     #set_ntp
     #configure_mirrors
@@ -76,8 +303,8 @@ main() {
     #create_logical_volumes
     #format_logical_volumes
     #mount_filesystems
+    echo "Success!??!"
 }
 
 main
-
 
