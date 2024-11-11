@@ -6,6 +6,18 @@ set -euo pipefail
 project_root=$(realpath "$(dirname "$0")")
 config_file="$project_root/install.conf"
 
+# logical volume properties
+# [name]="<filesystem>,2TB,1TB,256GB,64GB,32GB"
+#       the number following the filesystem correspond to the reccomented vg size for each disk size listed
+declare -A lv_properties=(
+    ["root"]="ext4,50,50,50,25,15"
+    ["var"]="ext4,50,50,50,10,5"
+    ["home"]="ext4,250,200,100,10,5"
+    ["data"]="ext4,500,200,15,1,1"
+    ["backup"]="ext4,500,250,10,5,1"
+    ["swap"]="swap,16,16,16,4,4"
+)
+
 print_intro() {
     clear
     echo "============================================================================"
@@ -401,18 +413,18 @@ partition_disk() {
 
     echo "Partitions $part1 and $part2 created on $disk."
 
-    ESP_PARTITION="$part1"
-    LVM_PARTITION="$part2"
+    esp_partition="$part1"
+    lvm_partition="$part2"
 }
 
 setup_luks_and_lvm() {
     echo "Setting up LUKS and LVM..."
     modprobe dm-crypt
 
-    read -rsp "Enter password to encrypt LUKS device: " luks_secret
-    echo
+    #read -rsp "Enter password to encrypt LUKS device: " luks_secret
+    #echo
 
-    echo "Setting up LUKS on $lvm_partition..."
+    echo "Setting up LUKS on $lvm_partition using provided LUKS password..."
     echo -n "$luks_secret" | cryptsetup luksFormat "$lvm_partition" -
 
     echo "Opening LUKS container"
@@ -424,6 +436,76 @@ setup_luks_and_lvm() {
     echo "Creating volume group $volume_group on $physical_volume"
     vgcreate "$volume_group" "/dev/mapper/$physical_volume"
 }
+
+suggest_lv_size() {
+    local vg_size=$1
+    local lv
+    local suggested_size
+    local matched_size=0
+    local lv_order=("root" "var" "home" "swap" "backup" "data")
+
+    # define an order to prompt user for feedback on the lv sizes
+    # Partition sizes used for suggestions
+    local size_tiers=(2048 1024 256 64 32)
+
+
+    for lv in "${lv_order[@]}"; do
+        IFS=',' read -r -a props <<< "${lv_properties[$lv]}"
+
+        # Waterfall approach: find the closest size tier within 10%
+        for size_tier in "${size_tiers[@]}"; do
+            lower_limit=$(echo "$size_tier * 0.9" | bc)
+            upper_limit=$(echo "$size_tier * 1.0" | bc)
+            if (( $(echo "$vg_size >= $lower_limit" | bc -l) && $(echo "$vg_size <= $upper_limit" | bc -l) )); then
+                case $size_tier in
+                    2048) suggested_size=${props[1]} ;;
+                    1024) suggested_size=${props[2]} ;;
+                    256)  suggested_size=${props[3]} ;;
+                    64)   suggested_size=${props[4]} ;;
+                    32)   suggested_size=${props[5]} ;;
+                esac
+                matched_size=1
+                break
+            fi
+        done
+
+        # Prompt the user with suggested size or ask for custom input
+        if (( matched_size == 1 )); then
+            echo "Suggested size for lv_$lv is ${suggested_size}G."
+            read -rp "Please enter a size for lv_$lv or press Enter to use the suggested size: " user_size
+            
+            if [[ -z "$user_size" ]]; then
+                user_size=${suggested_size}
+            fi
+        else
+            read -rp "Please enter a size for lv_$lv: " user_size
+        fi
+        
+        # Ensure the user size has 'G' appended
+        if [[ ! "$user_size" =~ G$ ]]; then
+            user_size="${user_size}G"
+        fi
+
+        # Create the logical volume
+        lvcreate -L "$user_size" "$volume_group" -n "lv_$lv"
+        echo "Created lv_$lv ($user_size GiB)"
+        echo ""
+    done
+}
+
+create_logical_volumes() {
+    echo ""
+    echo "Creating logical volumes..."
+    # Step 1: Get the initial free space in the volume group
+    remaining_space=$(vgs vg0 --units m --noheadings --nosuffix -o vg_free | awk '{print int($1)}')
+    remaining_space=$((remaining_space / 1024))
+    echo "Available space in Volume Group ($volume_group): $remaining_space GiB"
+    echo ""
+
+    # Step 2: Call the suggest_lv_size function
+    suggest_lv_size "$remaining_space"
+}
+
 
 main() {
     clear
@@ -439,7 +521,7 @@ main() {
     is_disk_encrypted_or_lvm
     partition_disk
     setup_luks_and_lvm
-    #create_logical_volumes
+    create_logical_volumes
     #format_logical_volumes
     #mount_filesystems
 }
