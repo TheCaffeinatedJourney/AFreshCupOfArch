@@ -405,6 +405,26 @@ partition_disk() {
     LVM_PARTITION="$part2"
 }
 
+setup_luks_and_lvm() {
+    echo "Setting up LUKS and LVM..."
+    modprobe dm-crypt
+
+    read -rsp "Enter password to encrypt LUKS device: " luks_secret
+    echo
+
+    echo "Setting up LUKS on $lvm_partition..."
+    echo -n "$luks_secret" | cryptsetup luksFormat "$lvm_partition" -
+
+    echo "Opening LUKS container"
+    echo -n "$luks_secret" | cryptsetup open "$lvm_partition" "$physical_volume" -
+
+    echo "Creating LVM physical volume $physical_volume"
+    pvcreate "/dev/mapper/$physical_volume"
+
+    echo "Creating volume group $volume_group on $physical_volume"
+    vgcreate "$volume_group" "/dev/mapper/$physical_volume"
+}
+
 main() {
     clear
     print_intro
@@ -418,7 +438,7 @@ main() {
     get_install_disk
     is_disk_encrypted_or_lvm
     partition_disk
-    #setup_luks_and_lvm
+    setup_luks_and_lvm
     #create_logical_volumes
     #format_logical_volumes
     #mount_filesystems
