@@ -284,6 +284,20 @@ update_config() {
     fi
 }
 
+check_connectivity() {
+    echo "Checking network connectivity..."
+    if ping -c 1 www.archlinux.org &>/dev/null; then
+        echo "Network connectivity is available."
+        return 0
+    else
+        echo "No network connectivity."
+        echo "Please connect to a wireless network using 'iwctl'."
+        echo "To list available networks, use: 'iwctl station <device> scan && iwctl station <device> get-networks'."
+        echo "To connect to a network, use: 'iwctl station <device> connect <SSID>'."
+        echo "After network connectivity has been established, re-run archinstall."
+        return 1
+    fi
+}
 
 
 main() {
@@ -291,10 +305,10 @@ main() {
     print_intro
     get_system_info
     set_required_vars
-    #check_connectivity
     #set_ntp
     #configure_mirrors
     #check_mirrorlist_updated
+    check_connectivity
     #show_mountpoints
     #get_install_disk
     #is_disk_encrypted_or_lvm
