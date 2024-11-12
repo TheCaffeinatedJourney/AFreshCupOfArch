@@ -530,6 +530,30 @@ format_logical_volumes() {
     done
 }
 
+mount_filesystems() {
+    echo "Mounting filesystems..."
+    echo "Mount root filesystem"
+    for lv in "${!lv_properties[@]}"; do
+	    if [ "$lv" == "root" ]; then
+            echo "Mounting lv_$lv to /mnt"
+	        mount /dev/vg0/lv_"$lv" /mnt
+	    fi
+    done
+
+    echo "Mouning lv_boot to /mnt/boot"
+    mkdir /mnt/boot
+    mount -o fmask=0077,dmask=0077 "$esp_partition" /mnt/boot
+
+    for lv in "${!lv_properties[@]}"; do
+	    if [ "$lv" != "root" ] && [ "$lv" != "swap" ]; then
+            echo "Mounting lv_$lv to /mnt/$lv"
+            mkdir /mnt/"$lv"
+	        mount /dev/vg0/lv_"$lv" /mnt/"$lv"
+	    fi
+    done
+}
+
+
 main() {
     clear
     print_intro
@@ -546,7 +570,7 @@ main() {
     setup_luks_and_lvm
     create_logical_volumes
     format_logical_volumes
-    #mount_filesystems
+    mount_filesystems
 }
 
 main
