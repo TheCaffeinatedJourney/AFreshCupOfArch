@@ -506,6 +506,29 @@ create_logical_volumes() {
     suggest_lv_size "$remaining_space"
 }
 
+format_logical_volumes() {
+    echo "Formatting logical volumes..."
+
+    echo "Formatting ESP partition ($esp_partition) as FAT32..."
+    mkfs.fat -F32 -n ESP "$esp_partition"
+
+    echo "Formatting volume groups..."
+    for lv in "${!lv_properties[@]}"; do
+        IFS=',' read -r -a props <<< "${lv_properties[$lv]}"
+        local fs_type=${props[0]}
+        echo "Formatting lv_$lv as $fs_type..."
+        if [ "$fs_type" != "swap" ]; then
+            mkfs."$fs_type" -L "$lv" /dev/vg0/lv_"$lv"
+	    elif [ "$fs_type" == "swap" ]; then
+	        mkswap -L "$lv" /dev/vg0/lv_"$lv"
+            echo "Turning on swap"
+	        swapon /dev/vg0/lv_"$lv"
+	    else
+    	    echo "Unsupported filesystem type: $fs_type"
+            return 1
+        fi
+    done
+}
 
 main() {
     clear
@@ -522,7 +545,7 @@ main() {
     partition_disk
     setup_luks_and_lvm
     create_logical_volumes
-    #format_logical_volumes
+    format_logical_volumes
     #mount_filesystems
 }
 
