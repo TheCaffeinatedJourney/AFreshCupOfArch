@@ -570,6 +570,26 @@ pacstrap_base_packages() {
 generate_fstab() {
     genfstab -U $chroot_dir >> "$chroot_dir/etc/fstab"
 }
+unmount_filesystems() {
+    umount -R "$chroot_dir"
+}
+
+close_LUKS() {
+    echo "Turning off swap..."
+    swapoff -va
+    
+    echo "Deactivating volume groups..."
+    vgchange -an
+
+    echo "Closing LUKS container $physical_volume..."
+    cryptsetup luksClose "$physical_volume"
+}
+
+print_goodbye_message() {
+    echo
+    echo
+    echo "It is now time to reboot into the new system..."
+}
 main() {
     clear
     print_intro
@@ -589,6 +609,10 @@ main() {
     mount_filesystems
     pacstrap_base_packages
     generate_fstab
+
+    unmount_filesystems
+    close_LUKS
+    print_goodbye_message
 }
 
 main
