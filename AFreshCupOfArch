@@ -553,6 +553,19 @@ mount_filesystems() {
     done
 }
 
+pacstrap_base_packages() {
+    base_packages=""
+
+    # Always include packages starting with "packages_base"
+    for var_name in "${!packages_base@}"; do
+        base_packages+=" ${!var_name}"
+    done
+    
+    # Run pacstrap with the final package list
+    base_packages=$(echo "$base_packages" | xargs) # Clean up extra spaces
+    echo "Installing packages: $base_packages"
+    pacstrap -K "$chroot_dir" $base_packages
+}
 
 main() {
     clear
@@ -571,6 +584,7 @@ main() {
     create_logical_volumes
     format_logical_volumes
     mount_filesystems
+    pacstrap_base_packages
 }
 
 main
