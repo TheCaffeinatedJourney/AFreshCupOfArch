@@ -567,6 +567,9 @@ pacstrap_base_packages() {
     pacstrap -K "$chroot_dir" $base_packages
 }
 
+generate_fstab() {
+    genfstab -U $chroot_dir >> "$chroot_dir/etc/fstab"
+}
 main() {
     clear
     print_intro
@@ -585,6 +588,7 @@ main() {
     format_logical_volumes
     mount_filesystems
     pacstrap_base_packages
+    generate_fstab
 }
 
 main
