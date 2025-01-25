@@ -190,6 +190,19 @@ manage_group_membership() {
     done
 }
 
+configure_skel() {
+    echo "Updating skel"
+    echo "Adding /bin to user home"
+    # update /etc/skel to add a /bin directory to each user's home.
+    mkdir /etc/skel/bin
+
+    echo "Updating .bashrc"
+    cp "$project_root/assets/.bashrc" /etc/skel/.bashrc
+
+
+    echo ""
+}
+
 configure_networkmanager
 set_ntp
 configure_reflector
@@ -199,3 +212,4 @@ configure_sudoers
 install_additional_core_packages
 bash_profile
 configure_bashrc
+configure_skel
