@@ -341,6 +341,7 @@ check_mirrorlist_updated() {
         fi
         echo "waiting..."
         sleep 3
+        i+=1
     done
     echo "Error: Reflector is not updating the mirrorlist."
     return 1
