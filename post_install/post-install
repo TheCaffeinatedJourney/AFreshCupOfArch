@@ -269,6 +269,14 @@ install_util-linux() {
     echo ""
 }
 
+install_pacman-contrib() {
+    echo "Installing and configuring pacman-contrib..."
+    pacman -S --noconfirm pacman-contrib
+
+    systemctl enable paccache.timer
+}    
+
+
 configure_networkmanager
 set_ntp
 configure_reflector
@@ -286,3 +294,4 @@ install_thunderbolt_utils
 
 
 install_util-linux
+install_pacman-contrib
