@@ -35,11 +35,29 @@ configure_locale() {
     sed -i '/^LANG=/c\LANG=en_US.UTF-8' /etc/locale.conf
 }
 
+set_hostname() {
+    echo "Setting the hostname to $hostname..."
+    echo "$hostname" > /etc/hostname
+    echo ""
+
+    # Update the /etc/hosts file
+    echo "Updating /etc/hosts..."
+    cat <<EOF > /etc/hosts
+127.0.0.1   localhost
+::1         localhost
+127.0.1.1   $hostname.localdomain $hostname
+EOF
+
+    hostnamectl set-hostname "$hostname"
+    echo "Hostname and /etc/hosts updated successfully!"
+}
+
 
 
 main() {
     set_time
     configure_locale
+    set_hostname
 }
 
 main
