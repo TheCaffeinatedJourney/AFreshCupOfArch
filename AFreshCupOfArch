@@ -622,6 +622,10 @@ pass_variable_to_file() {
     echo "Transferred $var_name=\"$var_value\" to $target_file."
 }
 
+escape_for_sed() {
+    # escape special characters for sed
+    local raw_value="$1"
+    printf '%s' "$raw_value" | sed 's/[&/\]/\\&/g'
 }
 unmount_filesystems() {
     umount -R "$chroot_dir"
