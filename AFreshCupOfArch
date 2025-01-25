@@ -756,6 +756,7 @@ clean_chroot() {
 
 
 unmount_filesystems() {
+    echo "Unmounting filesystems..."
     umount -R "$chroot_dir"
     echo ""
 }
@@ -769,6 +770,7 @@ close_LUKS() {
 
     echo "Closing LUKS container $physical_volume..."
     cryptsetup luksClose "$physical_volume"
+
     echo ""
 }
 
