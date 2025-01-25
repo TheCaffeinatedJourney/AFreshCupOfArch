@@ -143,6 +143,12 @@ EOF
     echo ""
 }
 
+configure_bashrc() {
+    echo "Updating /etc/bash.bashrc"
+    cp "$project_root/assets/bash.bashrc" /etc/bash.bashrc
+    echo ""
+}
+
 configure_networkmanager
 set_ntp
 configure_reflector
@@ -151,3 +157,4 @@ configure_makepkg
 configure_sudoers
 install_additional_core_packages
 bash_profile
+configure_bashrc
