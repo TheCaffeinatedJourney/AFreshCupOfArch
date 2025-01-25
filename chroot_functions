@@ -120,6 +120,22 @@ surpress_initramfs_warnings() {
     echo "Device not available" > /lib/firmware/qat_420xx_mmp.bin
 }
 
+generate_initramfs() {
+    echo "Identifying installed kernels and generating initramfs..."
+
+    # Find installed kernels (look for /boot/vmlinuz-* files)
+    kernels=$(ls /boot/vmlinuz-* | xargs -n 1 basename | sed 's/vmlinuz-//')
+
+    # Generate initramfs for each installed kernel
+    for kernel in $kernels; do
+        echo "Generating initramfs for kernel: $kernel"
+        mkinitcpio -p "$kernel"
+    done
+
+    echo "Initramfs generation complete for all installed kernels."
+    echo ""
+}
+
 
 
 main() {
@@ -130,6 +146,7 @@ main() {
     configure_mkinitcpio
     surpress_initramfs_warnings
     update_encrypt_hook
+    generate_initramfs
 }
 
 main
