@@ -97,34 +97,33 @@ set_required_vars() {
     local undefined_vars=()
     local is_password
 
-    echo ""
     echo "Checking config for variable preset values:"
 
     # Check if variables are defined and prepare output
-for var in "${required_vars[@]}"; do
-    IFS=":" read -r var_name description <<< "$var"
-
-    # Check for passwords by identifying "_secret" suffix
-    if [[ "$var_name" == *_secret ]]; then
-        is_password=1
-    else
-        is_password=0
-    fi
+    for var in "${required_vars[@]}"; do
+        IFS=":" read -r var_name description <<< "$var"
     
-    # Check if variable is defined
-    if [[ -n "${!var_name:-}" ]]; then
-        current_values["$var_name"]="${!var_name}"
-        # Debug: Show the current value or indicate it's a password
-        if [[ "$is_password" -eq 1 ]]; then
-            echo "$description ($var_name) = ********"
+        # Check for passwords by identifying "_secret" suffix
+        if [[ "$var_name" == *_secret ]]; then
+            is_password=1
         else
-            echo "$description ($var_name) = ${current_values[$var_name]}"
+            is_password=0
         fi
-    else
-        undefined_vars+=("$var_name")
-    fi
-done
-
+        
+        # Check if variable is defined
+        if [[ -n "${!var_name:-}" ]]; then
+            current_values["$var_name"]="${!var_name}"
+            # Debug: Show the current value or indicate it's a password
+            if [[ "$is_password" -eq 1 ]]; then
+                echo "$description ($var_name) = ********"
+            else
+                echo "$description ($var_name) = ${current_values[$var_name]}"
+            fi
+        else
+            undefined_vars+=("$var_name")
+        fi
+    done
+    
 
     # If there are undefined variables, prompt the user for input
     if ((${#undefined_vars[@]} > 0)); then
@@ -147,34 +146,33 @@ done
         done
     fi
 
-# In the `else` block, prompt for other undefined variables
-if confirm_proceed; then
-    echo "Proceeding with current values..."
-else
-    # Prompt to update only defined values
-    for var in "${!current_values[@]}"; do
-        local current="${current_values[$var]:-}"
-        case "$var" in
-            *_secret)
-                prompt_password "$var"
-                ;;
-            "disable_root")
-                prompt_boolean "$var"
-                ;;
-            "default_kernel")
-                prompt_kernel "$var"
-                ;;
-            *)
-                if [[ -n "$current" ]]; then
-                    read -rp "Please enter a new value for $var (current: ${current_values[$var]}): " value
-                else
-                    read -rp "Please enter a value for $var:" value
-                fi
-                current_values["$var"]="${value:-${current_values[$var]}}"
-                ;;
-        esac
-    done
-fi
+    if confirm_proceed; then
+        echo "Proceeding with current values..."
+    else
+        # Prompt to update only defined values
+        for var in "${!current_values[@]}"; do
+            local current="${current_values[$var]:-}"
+            case "$var" in
+                *_secret)
+                    prompt_password "$var"
+                    ;;
+                "disable_root")
+                    prompt_boolean "$var"
+                    ;;
+                "default_kernel")
+                    prompt_kernel "$var"
+                    ;;
+                *)
+                    if [[ -n "$current" ]]; then
+                        read -rp "Please enter a new value for $var (current: ${current_values[$var]}): " value
+                    else
+                        read -rp "Please enter a value for $var:" value
+                    fi
+                    current_values["$var"]="${value:-${current_values[$var]}}"
+                    ;;
+            esac
+        done
+    fi
     echo ""
 }
 
@@ -277,27 +275,6 @@ validate_kernel() {
             return 1  # Not a valid kernel
             ;;
     esac
-}
-
-# Update or create a configuration variable
-update_config() {
-    local config_var="$1"
-    local new_value="$2"
-
-    # Escape special characters for sed
-    local escaped_value
-    escaped_value=$(printf '%s\n' "$new_value" | sed -e 's/[\/&]/\\&/g')
-
-    # Check if the config variable exists in the config_file file
-    if grep -q "^$config_var=" "$config_file"; then
-        # Update the existing config variable with the unescaped new value
-        sed -i "s|^$config_var=.*|$config_var=\"$escaped_value\"|" "$config_file"
-        echo "Updated $config_var to $new_value in $config_file"
-    else
-        # Add the config variable with the new value to the end of the file
-        echo "$config_var=\"$new_value\"" >> "$config_file"
-        echo "Added $config_var with value $new_value to $config_file"
-    fi
 }
 
 check_connectivity() {
