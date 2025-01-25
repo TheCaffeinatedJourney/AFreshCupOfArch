@@ -10,9 +10,17 @@ physical_volume=""
 root_secret=""
 is_vm=""
 
+set_time() {
+    echo "Setting timezone and syncing hardware clock to system clock."
+    ln -sf /usr/share/zoneinfo/America/Detroit /etc/localtime
+    hwclock --systohc
+    timedatectl set-ntp true
+}
+
 
 
 main() {
+    set_time
 }
 
 main
