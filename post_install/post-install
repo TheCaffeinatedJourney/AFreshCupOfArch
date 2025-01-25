@@ -336,6 +336,24 @@ install_audio() {
 
 # configs that may need a user to be added to a group
 
+configure_bluetooth() {
+    echo "Installing and configuring bluetooth..."
+    pacman -S --noconfirm bluez bluez-utils
+    
+    # Load the btusb module if it isn't currently loaded
+    if ! lsmod | grep -q "^btusb"; then
+        modprobe btusb
+    fi
+
+    systemctl enable --now bluetooth.service
+
+    # Add users to the lp group if they will be connecting to a bluetooth tether
+    local groupname="lp"
+    echo "Users must be added to the $groupname group if they will be connecting to a bluetooth tether." 
+    manage_group_membership $groupname
+    echo ""
+}
+
 configure_networkmanager
 set_ntp
 configure_reflector
@@ -359,4 +377,6 @@ install_firefox
 install_xorg
 install_i3
 install_lightdm
+
 install_audio
+configure_bluetooth
