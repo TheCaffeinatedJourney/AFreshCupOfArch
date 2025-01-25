@@ -627,6 +627,59 @@ escape_for_sed() {
     local raw_value="$1"
     printf '%s' "$raw_value" | sed 's/[&/\]/\\&/g'
 }
+
+prepare_chroot() {
+
+    echo "Preparing chroot script..."
+    
+    local tmp_dir="$chroot_dir$chroot_tmp_dir"
+    local chroot_script="$tmp_dir/$chroot_setup_file"
+
+    # Create the temporary directory
+    mkdir -p "$tmp_dir"
+
+    # Copy the chroot functions script
+    if [[ -f "./$chroot_functions" ]]; then
+        cp "./$chroot_functions" "$chroot_script"
+    else
+        echo "Error: ./$chroot_functions not found!" >&2
+        return 1
+    fi
+
+    # Update variable declarations in the script using sed
+    for var in hostname \
+                processor_vendor \
+                esp_partition \
+                lvm_partition \
+                volume_group \
+                default_kernel \
+                root_secret \
+                is_vm; do
+        # Check if the variable is set
+        if [[ -v "$var" ]]; then
+            # Escape special characters in the variable value
+            local value
+            value=$(escape_for_sed "${!var}")
+
+            # Log that the variable is set
+            echo "Set $var to: $value"
+
+            # Update the variable in the script
+            sed -i "s|^${var}=.*|${var}=\"${value}\"|" "$chroot_script"
+        else
+            # Log that the variable is not set
+            echo "$var has not been set, skipping..."
+        fi
+    done
+
+    # Ensure the script is executable
+    chmod +x "$chroot_script"
+
+    # Print message
+    echo "Chroot preparation script created at $chroot_script"
+}
+
+
 unmount_filesystems() {
     umount -R "$chroot_dir"
     echo ""
