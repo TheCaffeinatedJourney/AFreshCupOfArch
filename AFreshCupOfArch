@@ -401,8 +401,6 @@ partition_disk() {
     part1=$(lsblk -lnpo NAME "${disk}" | sed -n '2p')  # First partition
     part2=$(lsblk -lnpo NAME "${disk}" | sed -n '3p')  # Second partition
 
-    echo "Partitions $part1 and $part2 created on $disk."
-
     esp_partition="$part1"
 
     lvm_partition="$part2"
