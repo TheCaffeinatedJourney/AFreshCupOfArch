@@ -680,6 +680,51 @@ prepare_chroot() {
 }
 
 
+override_chroot_variables() {
+    # use this for testing only
+    echo "Overriding chroot variables for testing..."
+
+    local tmp_dir="$chroot_dir$chroot_tmp_dir"
+    local chroot_script="$tmp_dir/$chroot_setup_file"
+
+    # Ensure the script exists
+    if [[ ! -f "$chroot_script" ]]; then
+        echo "Error: $chroot_script not found!" >&2
+        return 1
+    fi
+
+    # Override values
+    local test_values=(
+        "hostname=archvm"
+        "processor_vendor=GenuineIntel"
+        "esp_partition=/dev/sda1"
+        "lvm_partition=/dev/sda2"
+        "volume_group=vg0"
+        "default_kernel=linux-lts"
+        "root_secret=rootpass"
+        "is_vm=true"
+        "physical_volume=pv0"
+    )
+
+    for value in "${test_values[@]}"; do
+        # Extract variable name and value
+        local var_name=${value%%=*}
+        local var_value=${value#*=}
+
+        # Escape special characters for sed
+        var_value=$(printf '%s' "$var_value" | sed 's/[&/\]/\\&/g')
+
+        # Update the variable in the script
+        sed -i "s|^${var_name}=.*|${var_name}=\"${var_value}\"|" "$chroot_script"
+
+        # Log the update
+        echo "Set $var_name to: $var_value"
+    done
+
+    echo "Chroot variables overridden successfully."
+}
+
+
 unmount_filesystems() {
     umount -R "$chroot_dir"
     echo ""
