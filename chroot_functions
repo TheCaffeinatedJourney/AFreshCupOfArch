@@ -17,10 +17,29 @@ set_time() {
     timedatectl set-ntp true
 }
 
+configure_locale() {
+    echo "Generating and configuring locales"
+
+    # Uncomment locale for en_US.UTF-8
+    sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
+    locale-gen
+
+    # Set the console keyboard layout and font
+    #loadkeys en
+    #setconsolefont XXXX
+
+    # Create locale configuration
+    locale >> /etc/locale.conf
+
+    # Set language variable
+    sed -i '/^LANG=/c\LANG=en_US.UTF-8' /etc/locale.conf
+}
+
 
 
 main() {
     set_time
+    configure_locale
 }
 
 main
