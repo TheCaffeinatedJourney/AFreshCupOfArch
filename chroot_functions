@@ -97,6 +97,23 @@ configure_mkinitcpio() {
     echo "mkinitcpio.conf modules, hooks, and compression configured successfuly!"
 }
 
+update_encrypt_hook() {
+    src_file="/usr/lib/initcpio/hooks/encrypt"
+    dest_file="/etc/initcpio/hooks/encrypt"
+
+    mkdir -p /etc/initcpio/hooks
+
+    cp "$src_file" "$dest_file"
+
+    warning_message="\n************************************************************************\n WARNING: UNAUTHORIZED ACCESS OR USE OF THIS SYSTEM IS A VIOLATION OF\n FEDERAL LAW (18 U.S.C. § 1030) AND MAY RESULT IN CRIMINAL PROSECUTION.\n************************************************************************\n\n    This system is protected by encryption and intrusion detection.\n   Any attempt to access or use this system constitutes an agreement\n   to collect personally identifiable information, including\n   but not limited to GPS location, IP address, and audio and video\n   recording.  This data will be logged and transmitted for security\n   and compliance purposes.\n\nIf you agree to these terms, enter a password to access the \${cryptname} volume."
+
+    # replace the original prompt with the new warning message
+    sed -i "s/A password is required to access the \${cryptname} volume:/$warning_message/g" "$dest_file"
+
+    echo "The encrypt hook has been updated with the new warning message."
+    echo ""
+}
+
 
 
 main() {
@@ -105,6 +122,7 @@ main() {
     set_hostname
     install_ucode
     configure_mkinitcpio
+    update_encrypt_hook
 }
 
 main
