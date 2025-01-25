@@ -71,6 +71,16 @@ configure_pacman() {
     echo ""
 }
 
+configure_makepkg() {
+    echo "Configuring makepkg"
+
+    # Allow makepkg to use all cores
+    sed -i "s/^[#]*MAKEFLAGS\s*=.*/MAKEFLAGS=\"-j$(nproc)\"/" /etc/makepkg.conf
+    
+    echo ""
+}
+
 configure_networkmanager
 set_ntp
 configure_pacman
+configure_makepkg
