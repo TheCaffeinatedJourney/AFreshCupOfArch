@@ -261,6 +261,14 @@ install_thunderbolt_utils() {
 }
 
 
+install_util-linux() {
+    echo "Installing and configuring util-linux..."
+    pacman -S --noconfirm util-linux
+
+    systemctl enable fstrim.timer
+    echo ""
+}
+
 configure_networkmanager
 set_ntp
 configure_reflector
@@ -277,3 +285,4 @@ install_timeshift
 install_thunderbolt_utils
 
 
+install_util-linux
