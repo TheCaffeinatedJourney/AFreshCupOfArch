@@ -354,6 +354,20 @@ configure_bluetooth() {
     echo ""
 }
 
+configure_locate() {
+    echo "Installing and configuring locate..."
+    pacman -S --noconfirm locate
+    conf="/etc/updatedb.conf"
+    # Append " /backup" to the PRUNEPATHS line before the ending quote
+    sed -i 's|\(PRUNEPATHS = ".*\)"|\1 /backup"|' "$conf"
+
+    # Add users to the locate group to allow administration of locate
+    local groupname="locate"
+    echo "Users must be added to the $groupname group to allow administration of locate"
+    manage_group_membership $groupname
+    echo ""
+}
+    
 configure_networkmanager
 set_ntp
 configure_reflector
@@ -380,3 +394,4 @@ install_lightdm
 
 install_audio
 configure_bluetooth
+configure_locate
