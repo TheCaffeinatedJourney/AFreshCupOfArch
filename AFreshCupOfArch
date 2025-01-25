@@ -5,6 +5,7 @@ set -euo pipefail
 # Get the absolute path of the project root
 project_root=$(realpath "$(dirname "$0")")
 config_file="$project_root/install.conf"
+source $config_file
 
 # logical volume properties
 # [name]="<filesystem>,2TB,1TB,256GB,64GB,32GB"
