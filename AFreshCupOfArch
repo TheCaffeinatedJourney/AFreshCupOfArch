@@ -353,7 +353,7 @@ show_mountpoints() {
 }
 
 get_install_disk() {
-    read -p "Enter the disk to partition (e.g., /dev/sda or sda): " disk
+    read -rp "Enter the disk to partition (e.g., /dev/sda or sda): " disk
 
     # Check if the user entered a device name without '/dev/' and prepend it
     if [[ ! "$disk" =~ ^/dev/ ]]; then
@@ -378,13 +378,14 @@ is_disk_encrypted_or_lvm() {
         lsblk -o NAME,SIZE,TYPE,FSTYPE,MOUNTPOINT "$disk"
 
         # Prompt the user to quit or continue (default to quit)
-        read -p "The disk contains LVM or encrypted data. Do you want to continue? [y/N]: " response
+        read -rp "The disk contains LVM or encrypted data. Do you want to continue? [y/N]: " response
         response=${response,,}  # Convert to lowercase
         if [[ "$response" != "y" ]]; then
             echo "User cancelled the installation."
             exit 1
         else
             echo "User selected continue."
+            echo""
         fi
     fi
     echo ""
@@ -403,7 +404,10 @@ partition_disk() {
     echo "Partitions $part1 and $part2 created on $disk."
 
     esp_partition="$part1"
+
     lvm_partition="$part2"
+
+    echo "Partitions $part1 and $part2 created on $disk."
     echo ""
 }
 
@@ -425,6 +429,7 @@ setup_luks_and_lvm() {
 
     echo "Creating volume group $volume_group on $physical_volume"
     vgcreate "$volume_group" "/dev/mapper/$physical_volume"
+
     echo ""
 }
 
