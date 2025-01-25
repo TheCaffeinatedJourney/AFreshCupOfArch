@@ -109,6 +109,7 @@ install_additional_core_packages() {
 
 configure_networkmanager
 set_ntp
+configure_reflector
 configure_pacman
 configure_makepkg
 configure_sudoers
