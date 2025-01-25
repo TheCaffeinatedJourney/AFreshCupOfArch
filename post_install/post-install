@@ -290,6 +290,12 @@ install_firefox() {
 }
 
 
+install_xorg() {
+    echo "Installing xorg, display drivers, and related tools..."
+    pacman -S --noconfirm arandr xorg-server xorg-xinit mesa vulkan-intel vulkan-mesa-layers intel-media-driver brightnessctl
+    echo ""
+}
+
 configure_networkmanager
 set_ntp
 configure_reflector
@@ -310,3 +316,4 @@ install_util-linux
 install_pacman-contrib
 install_applets
 install_firefox
+install_xorg
