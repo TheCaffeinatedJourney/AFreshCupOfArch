@@ -140,6 +140,65 @@ get_uuid() {
     blkid -s UUID -o value "$1"
 }
 
+configure_systemd-boot() {
+
+    echo "Configuring systemd-boot"
+
+    # Find installed kernels (look for /boot/vmlinuz-* files)
+    kernels=($(ls /boot/vmlinuz-* | xargs -n 1 basename | sed 's/vmlinuz-//'))
+
+    if [ ${#kernels[@]} -eq 0 ]; then
+        echo "No kernels found. Exiting."
+        exit 1
+    fi
+
+    # Display installed kernels to the user
+    echo "Installed kernels:"
+    for kernel in "${kernels[@]}"; do
+        echo "  - $kernel"
+    done
+
+    # Identify the root and swap partitions (assuming LVM)
+    root_lv="/dev/mapper/$volume_group-lv_root"
+    swap_lv="/dev/mapper/$volume_group-lv_swap"
+
+    # Get UUID of the cryptdevice
+    cryptdevice_uuid=$(get_uuid "$lvm_partition")
+
+ #   # Get the swap partition UUID for the resume option
+ #   swap_uuid=$(get_uuid "$swap_lv")
+
+    # Set up the bootloader entries
+    echo "Installing bootloader"
+    bootctl install
+    
+    # Enable automatic updates of the UEFI boot manager
+    echo "Enabling systemd-boot-update.service"
+    systemctl enable systemd-boot-update.service
+
+    # Generate loader.conf
+    echo "Generating /boot/loader/loader.conf..."
+    cat <<EOF > /boot/loader/loader.conf
+default $default_kernel.conf
+timeout 3
+editor 0
+EOF
+
+    # Generate entries for each kernel
+    # cryptdevice=UUID=device-UUID:cryptlvm root=/dev/MyVolGroup/root
+    for kernel in "${kernels[@]}"; do
+        echo "Generating /boot/loader/entries/${kernel}.conf..."
+
+        cat <<EOF > /boot/loader/entries/"${kernel}".conf
+title   $kernel
+linux /vmlinuz-$kernel
+initrd /$ucode_package.img
+initrd /initramfs-$kernel.img
+options cryptdevice=UUID=$cryptdevice_uuid:$physical_volume root=$root_lv resume=$swap_lv rw
+EOF
+    done
+}
+
 
 main() {
     set_time
@@ -150,6 +209,7 @@ main() {
     surpress_initramfs_warnings
     update_encrypt_hook
     generate_initramfs
+    configure_systemd-boot
 }
 
 main
