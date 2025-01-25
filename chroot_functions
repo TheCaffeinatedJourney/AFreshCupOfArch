@@ -199,6 +199,30 @@ EOF
     done
 }
 
+set_root_password() {
+    if [[ -n "${root_secret}" ]]; then
+        echo "Setting root password..."
+        echo -e "${root_secret}" | passwd -s root
+        if [[ $? -eq 0 ]]; then
+            echo "Root password set successfully."
+        else
+            echo "Failed to set root password."
+        fi
+    else
+        while true; do
+            echo "Please enter the root password:"
+            passwd root
+            if [[ $? -eq 0 ]]; then
+                echo "Root password set successfully."
+                break
+            else
+                echo "Password setting failed. Please try again."
+            fi
+        done
+    fi
+}
+
+
 
 main() {
     set_time
@@ -210,6 +234,7 @@ main() {
     update_encrypt_hook
     generate_initramfs
     configure_systemd-boot
+    set_root_password
 }
 
 main
