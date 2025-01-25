@@ -71,7 +71,7 @@ get_system_info() {
     echo "Processor vendor detected: $processor_vendor"
     echo "Memory statistics: ${memory_available_mb}MB available out of ${memory_total_mb}MB total installed"
     echo "Virtualization detected: $virtualization_platform; is VM: $is_vm"
-    echo "Graphics devices detected: dict_keys(['$graphics_device'])"
+    echo "Graphics devices detected: $graphics_device"
     echo ""
 }
 
