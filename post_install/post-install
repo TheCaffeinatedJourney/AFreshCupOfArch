@@ -312,6 +312,30 @@ install_lightdm() {
     echo ""
 }
 
+install_audio() {
+    echo "Installing alsa, pipewire, pulseaudio, and related tools..."
+    pacman -S --noconfirm \
+        alsa-firmware \
+        alsa-plugins \
+        alsa-utils \
+        pipewire \
+        pipewire-alsa \
+        pipewire-audio \
+        pipewire-docs \
+        pipewire-jack \
+        pipewire-pulse \
+        pipewire-x11-bell \
+        sof-firmware \
+        sof-tools \
+        wireplumber \
+        wireplumber-docs \
+        ffmpeg \
+        ffmpegthumbs \
+        helvum \
+        realtime-privileges 
+
+# configs that may need a user to be added to a group
+
 configure_networkmanager
 set_ntp
 configure_reflector
@@ -335,3 +359,4 @@ install_firefox
 install_xorg
 install_i3
 install_lightdm
+install_audio
