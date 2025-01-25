@@ -114,6 +114,12 @@ update_encrypt_hook() {
     echo ""
 }
 
+surpress_initramfs_warnings() {
+    # see https://intel.github.io/quickassist/RN/In-Tree/in_tree_firmware_RN.html?highlight=qat_420xx#id6
+    echo "Device not available" > /lib/firmware/qat_420xx.bin
+    echo "Device not available" > /lib/firmware/qat_420xx_mmp.bin
+}
+
 
 
 main() {
@@ -122,6 +128,7 @@ main() {
     set_hostname
     install_ucode
     configure_mkinitcpio
+    surpress_initramfs_warnings
     update_encrypt_hook
 }
 
