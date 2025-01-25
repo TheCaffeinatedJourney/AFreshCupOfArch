@@ -11,4 +11,24 @@ configure_networkmanager() {
     echo ""
 }
 
+set_ntp() {
+    echo "Setting ntp..."
+    timedatectl set-ntp true
+    echo ""
+}
+
+configure_reflector() {
+   echo "Configuring reflector"
+   echo "Updating reflector.conf"
+   cp "$project_root/assets/reflector.conf" /etc/xdg/reflector/reflector.conf
+
+   echo "Enabling reflector.service and reflector.timer"
+   # Enable reflector.service to run reflector on boot, enabling now also runs it immediately
+   systemctl enable --now reflector.service
+   systemctl enable reflector.timer
+
+   echo ""
+}
+
 configure_networkmanager
+set_ntp
