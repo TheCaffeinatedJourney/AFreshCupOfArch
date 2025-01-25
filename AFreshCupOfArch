@@ -725,6 +725,26 @@ override_chroot_variables() {
 }
 
 
+
+chroot_install() {
+    local chroot_script="$chroot_tmp_dir/$chroot_setup_file"
+    echo "Entering chroot to run '$chroot_setup_file'..."
+    
+    # Enter chroot and execute the script
+    arch-chroot /mnt /bin/bash <<EOF
+bash "$chroot_script"
+EOF
+
+    if [[ $? -eq 0 ]]; then
+        echo "Chroot script executed successfully."
+    else
+        echo "Error: Chroot script execution failed." >&2
+        return 1
+    fi
+
+    echo ""
+}
+
 unmount_filesystems() {
     umount -R "$chroot_dir"
     echo ""
