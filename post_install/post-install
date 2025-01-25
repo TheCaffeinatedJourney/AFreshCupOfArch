@@ -80,7 +80,26 @@ configure_makepkg() {
     echo ""
 }
 
+configure_sudoers() {
+    echo "Configuring sudoers"
+    sudoers_file="/etc/sudoers"
+
+    # Uncomment the %wheel line if commented
+    sed -i 's/^[#]\(%wheel ALL=(ALL:ALL) ALL\)/\1/' "$sudoers_file"
+
+    # Add the Defaults insults line at the end if it's not already there
+    if ! grep -q '^Defaults insults$' "$sudoers_file"; then
+        {
+            echo ""
+            echo "#  If set, sudo will insult users when they enter an incorrect password."
+            echo "Defaults insults"
+        } >> "$sudoers_file"
+    fi
+    echo ""
+}
+
 configure_networkmanager
 set_ntp
 configure_pacman
 configure_makepkg
+configure_sudoers
