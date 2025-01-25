@@ -306,6 +306,12 @@ install_i3() {
 }
 
 
+install_lightdm() {
+    echo "Installing lightdm..."
+    pacman -S --noconfirm lightdm lightdm-slick-greeter
+    echo ""
+}
+
 configure_networkmanager
 set_ntp
 configure_reflector
@@ -328,3 +334,4 @@ install_applets
 install_firefox
 install_xorg
 install_i3
+install_lightdm
