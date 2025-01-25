@@ -259,6 +259,10 @@ enable_vboxservice() {
     fi
 }
 
+print_goodbye_message() {
+    echo "chroot setup complete!"
+    echo ""
+}
 
 main() {
     set_time
@@ -274,6 +278,7 @@ main() {
     if [[ $is_vm == "true" ]]; then
         enable_vboxservice
     fi
+    print_goodbye_message
 }
 
 main
