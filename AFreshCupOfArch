@@ -589,7 +589,10 @@ pacstrap_packages() {
 }
 
 generate_fstab() {
-    genfstab -U $chroot_dir >> "$chroot_dir/etc/fstab"
+    echo "Generating fstab..."
+    genfstab -pU "$chroot_dir" >> "$chroot_dir/etc/fstab"
+    echo ""
+}
 }
 unmount_filesystems() {
     umount -R "$chroot_dir"
