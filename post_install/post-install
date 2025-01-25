@@ -5,3 +5,10 @@ set -euo pipefail
 project_root=$(realpath "$(dirname "$0")")
 
 
+configure_networkmanager() {
+    echo "Enabling NetworkManager.service"
+    systemctl enable --now NetworkManager.service
+    echo ""
+}
+
+configure_networkmanager
