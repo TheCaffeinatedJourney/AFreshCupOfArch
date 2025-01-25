@@ -779,12 +779,16 @@ print_goodbye_message() {
     echo
     echo "It is now time to reboot into the new system..."
 }
+
+
 main() {
     clear
     print_intro
     get_system_info
     set_required_vars
     check_connectivity
+
+    ## initial setup
     set_ntp
     configure_mirrors
     check_mirrorlist_updated
@@ -796,12 +800,23 @@ main() {
     create_logical_volumes
     format_logical_volumes
     mount_filesystems
-    pacstrap_base_packages
+    update_parallel_downloads
+    pacstrap_packages base
+    pacstrap_packages essential
+    pacstrap_packages networking
     generate_fstab
 
-    unmount_filesystems
-    close_LUKS
-    print_goodbye_message
+    ##chroot
+    prepare_chroot
+    override_chroot_variables  # use for testing only
+    chroot_install
+
+
+    ##cleanup and exit
+#    clean_chroot
+#    unmount_filesystems
+#    close_LUKS
+#    print_goodbye_message
 }
 
 main
