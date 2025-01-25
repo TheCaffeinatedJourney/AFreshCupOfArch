@@ -203,6 +203,11 @@ configure_skel() {
     echo ""
 }
 
+install_polkit() {
+    echo "Installing polkit..."
+    pacman -S --noconfirm polkit polkit-gnome
+    echo ""
+}
 configure_networkmanager
 set_ntp
 configure_reflector
@@ -213,3 +218,5 @@ install_additional_core_packages
 bash_profile
 configure_bashrc
 configure_skel
+
+install_polkit
