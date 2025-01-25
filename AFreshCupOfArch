@@ -549,18 +549,28 @@ mount_filesystems() {
     echo ""
 }
 
-pacstrap_base_packages() {
-    base_packages=""
 
-    # Always include packages starting with "packages_base"
-    for var_name in "${!packages_base@}"; do
-        base_packages+=" ${!var_name}"
+pacstrap_packages() {
+    local prefix="$1"
+    local packages_var
+    local package_list=""
+
+    # Iterate over variables that match the given prefix
+    for packages_var in $(compgen -A variable | grep "^packages_${prefix}"); do
+        package_list+=" ${!packages_var}"
     done
-    
-    # Run pacstrap with the final package list
-    base_packages=$(echo "$base_packages" | xargs) # Clean up extra spaces
-    echo "Installing packages: $base_packages"
-    pacstrap -K "$chroot_dir" $base_packages
+
+    # Clean up any extra spaces
+    package_list=$(echo "$package_list" | xargs)
+
+    if [[ -z "$package_list" ]]; then
+        echo "No $prefix packages found." >&2
+        return 1
+    fi
+
+    echo "Installing $prefix packages: $package_list"
+    pacstrap -K "$chroot_dir" $package_list
+    echo ""
 }
 
 generate_fstab() {
