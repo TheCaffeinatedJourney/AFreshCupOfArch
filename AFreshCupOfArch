@@ -312,11 +312,12 @@ configure_mirrors() {
     # Check to see if reflector is installed
     if ! which reflector > /dev/null; then
         echo "Installing reflector"
-        pacman -Sy --noconfirm reflector
+        pacman -S --noconfirm reflector
     fi
 
     # Update mirrors
     reflector --verbose --latest 5 --protocol https --sort score --threads 5 --save /etc/pacman.d/mirrorlist
+    echo "Mirrors updated."
     echo ""
 }
 
