@@ -52,12 +52,43 @@ EOF
     echo "Hostname and /etc/hosts updated successfully!"
 }
 
+install_ucode() {
+    echo "Detecting processor type for microcode installation..."
+
+    # Determine the appropriate microcode package
+    local ucode_package
+    if echo "$processor_model" | grep -iq "Intel"; then
+        ucode_package="intel-ucode"
+        echo "Intel processor detected."
+    elif echo "$processor_model" | grep -iq "AMD"; then
+        ucode_package="amd-ucode"
+        echo "AMD processor detected."
+    else
+        echo "Unknown processor type. Skipping microcode installation."
+        echo ""
+        return 
+    fi
+
+    # Check if the microcode package is already installed
+    if pacman -Qq "$ucode_package" > /dev/null 2>&1; then
+        echo "$ucode_package is already installed. Skipping."
+        echo ""
+        return 
+    fi
+
+    # Install the appropriate microcode package
+    echo "Installing $ucode_package..."
+    pacman -S --noconfirm "$ucode_package"
+    echo ""
+}
+
 
 
 main() {
     set_time
     configure_locale
     set_hostname
+    install_ucode
 }
 
 main
