@@ -208,6 +208,16 @@ install_polkit() {
     pacman -S --noconfirm polkit polkit-gnome
     echo ""
 }
+
+install_timeshift() {
+    echo "Installing timeshift..."
+    pacman -S --noconfirm timeshift
+
+    # enable cronie service
+    systemctl enable cronie.service
+    echo ""
+}
+
 configure_networkmanager
 set_ntp
 configure_reflector
@@ -220,3 +230,4 @@ configure_bashrc
 configure_skel
 
 install_polkit
+install_timeshift
