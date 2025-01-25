@@ -82,6 +82,21 @@ install_ucode() {
     echo ""
 }
 
+configure_mkinitcpio() {
+    echo "Configuring mkinitcpio"
+
+    # Update modules to use a keyboard and displays connected through a docing sation and/or USB3 hub
+    sed -i 's/^MODULES=.*/MODULES=(i915 usbhid xhci_hcd)/' /etc/mkinitcpio.conf
+
+    # Modify mkinitcpio to include necessary hooks for LVM, encryption, etc.
+    sed -i 's/^HOOKS=.*/HOOKS=(base autodetect modconf microcode kms keymap keyboard udev block encrypt lvm2 filesystems fsck)/' /etc/mkinitcpio.conf
+
+    # Update the compression to lz4
+    sed -i 's/^#COMPRESSION="lz4"/COMPRESSION="lz4"/' /etc/mkinitcpio.conf
+
+    echo "mkinitcpio.conf modules, hooks, and compression configured successfuly!"
+}
+
 
 
 main() {
@@ -89,6 +104,7 @@ main() {
     configure_locale
     set_hostname
     install_ucode
+    configure_mkinitcpio
 }
 
 main
