@@ -277,6 +277,12 @@ install_pacman-contrib() {
 }    
 
 
+install_applets() {
+    echo "Installing applets..."
+    pacman -S --noconfirm network-manager-applet
+    echo ""
+}
+
 configure_networkmanager
 set_ntp
 configure_reflector
@@ -295,3 +301,4 @@ install_thunderbolt_utils
 
 install_util-linux
 install_pacman-contrib
+install_applets
