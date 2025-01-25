@@ -1,0 +1,53 @@
+
+#############################################################################
+###   notes                                                               ###
+#############################################################################
+#
+# Keybinding
+# Using keysym is preferpred. To get the current mapping use 'xmodmap -pke'
+# To get interactive mapping, use xev
+#
+# Application Info
+# you can assign an application using its class, instance, or both
+# to get the class and instance name, run 'xprop | grep WM_CLASS' then click the applicaiton
+# result will look like this: WM_CLASS(STRING) = "<instance>", "<class>"
+#
+# class second part of WM_CLASS 'xprop | grep WM_CLASS'
+# instance first part of WM_CLASS 'xprop | grep WM_CLASS'
+# window_role WM_WINDOW_ROLE 'xprop | grep WM_WINDOW_ROLE'
+#         examples: "GtkFileChooserDialog"
+# window_type _NET_WM_WINDOW_TYPE 'xprop | grep NET_WM_WINDOW_TYPE'
+#         examples: normal, dialog, utility, toolbar, splash, menu, dropdown_menu, popup_menu, tooltip and notification. 
+# id X11 Window id 'xwininfo | grep "Window id: "'
+# title _NET_WM_NAME or WM_NAME 'xprop | grep WM_NAME'
+# urgent latest, oldest, newest, last, recent, first
+
+#############################################################################
+###   display configuration (xrandr, arandr, autorandr)                   ###
+#############################################################################
+#
+# use arandr gui to set up new display configuration
+# optionally save arandr configuration and/or xrandr script
+#
+# set fallback configuration
+# 	autorandr --default <profile>
+#
+# save configuration and setup with autorandr using 
+# 	autorandr --save <profile>
+#
+# automatically load profile of detected hardware
+# 	autorandr --change
+#
+# manually load profile
+# 	autorandr --load <profile>
+#
+# force reload 
+# autorandr --load <profile> --force
+
+
+#############################################################################
+###   Include files                                                       ###
+#############################################################################
+#
+# This config uses the include directive to split individual configuation components into easier to manage files
+# some configuration files are nested, in those cases the parent directory incldues an include_* file which lists the files to include within the nested directory

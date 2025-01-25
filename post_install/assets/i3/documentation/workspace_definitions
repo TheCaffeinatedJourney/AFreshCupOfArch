@@ -1,0 +1,154 @@
+# i3 config file (v4)
+
+# workspaces
+# set $ws1 "1: " 
+# set $ws2 "2: " 
+# set $ws3 "3: " 
+# set $ws4 "4: " 
+# set $ws5 "5: " 
+# set $ws6 "6: " 
+# set $ws7 "7: " 
+# set $ws8 "8: 󰟐" 
+# set $ws9 "9: " 
+# set $ws10 "10:  " 
+# set $ws11 "VM: 󰎤󰎩"
+# set $ws12 "VM: 󰎦󰎧"
+
+
+# Jira 󰌃
+# Bitwarden  󰞀
+# Home Assistant 󰟐
+# Music 󰝚 / Podcast 󰦔
+# YNAB 󰬠
+# UNIFI 󰬜
+# 
+# ACCOUNTING  
+# OFFICE SUITE 󱔘
+# btop/neofetch 󰙮  󱤘 
+# info
+# 
+# 
+
+
+set $ws11 "1.1"
+set $ws12 "1.2"
+set $ws13 "1.3"
+set $ws14 "1.4"
+set $ws15 "1.5"
+set $ws16 "1.6"
+set $ws17 "1.7"
+set $ws18 "1.8"
+set $ws19 "1.9"
+set $ws10 "1.10"
+
+
+set $ws21 "2.1"
+set $ws22 "2.2"
+set $ws23 "2.3"
+set $ws24 "2.4"
+set $ws25 "2.5"
+set $ws26 "2.6"
+set $ws27 "2.7"
+set $ws28 "2.8"
+set $ws29 "2.9"
+set $ws20 "2.10"
+
+
+set $ws31 "3.1"
+set $ws32 "3.2"
+set $ws33 "3.3"
+set $ws34 "3.4"
+set $ws35 "3.5"
+set $ws36 "3.6"
+set $ws37 "3.7"
+set $ws38 "3.8"
+set $ws39 "3.9"
+set $ws30 "3.10"
+
+
+set $ws41 "4.1"
+set $ws42 "4.2"
+set $ws43 "4.3"
+set $ws44 "4.4"
+set $ws45 "4.5"
+set $ws46 "4.6"
+set $ws47 "4.7"
+set $ws48 "4.8"
+set $ws49 "4.9"
+set $ws40 "4.10"
+
+
+
+
+set $mode_workspace_selection_0 (1) General Workspaces, (2) Application Specific, (3) Webapps, (4) Work
+set $mode_workspace_selection_1 Enter a workspace number
+set $mode_workspace_selection_2 (T)hunderbird, GNU(C)ash, (B)itwarden
+set $mode_workspace_selection_3 (J)ira, (C)ypress, (H)omeAssistant, (P)odurama, (U)nifi, (Y)NAB
+set $mode_workspace_selection_4 VMWare Display (1), VMWare Display (2)
+mode "$mode_workspace_selection_0" {
+    bindsym 1 mode "$mode_workspace_selection_1 {
+        bindsym 1 workspace $ws11
+        bindsym 2 workspace $ws12 
+        bindsym 3 workspace $ws13
+        bindsym 4 workspace $ws14
+        bindsym 5 workspace $ws15
+        bindsym 6 workspace $ws16
+        bindsym 7 workspace $ws17
+        bindsym 8 workspace $ws18
+        bindsym 9 workspace $ws19
+        bindsym 0 workspace $ws10
+        bindsym $mod+1 workspace $ws11
+        bindsym $mod+2 workspace $ws12 
+        bindsym $mod+3 workspace $ws13
+        bindsym $mod+4 workspace $ws14
+        bindsym $mod+5 workspace $ws15
+        bindsym $mod+6 workspace $ws16
+        bindsym $mod+7 workspace $ws17
+        bindsym $mod+8 workspace $ws18
+        bindsym $mod+9 workspace $ws19
+        bindsym $mod+0 workspace $ws10
+    
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+        bindsym space mode "default"
+        bindsym BackSpace mode "default"
+    }
+    bindsym 2 mode "$mode_workspace_selection_2 {
+    }
+    bindsym 3 mode "$mode_workspace_selection_3 {
+        bindsym 1 workspace $ws31
+        bindsym 2 workspace $ws32 
+        bindsym 3 workspace $ws33
+        bindsym 4 workspace $ws34
+        bindsym 5 workspace $ws35
+        bindsym 6 workspace $ws36
+        bindsym 7 workspace $ws37
+        bindsym 8 workspace $ws38
+        bindsym 9 workspace $ws39
+        bindsym 0 workspace $ws30
+        bindsym $mod+1 workspace $ws31
+        bindsym $mod+2 workspace $ws32 
+        bindsym $mod+3 workspace $ws33
+        bindsym $mod+4 workspace $ws34
+        bindsym $mod+5 workspace $ws35
+        bindsym $mod+6 workspace $ws36
+        bindsym $mod+7 workspace $ws37
+        bindsym $mod+8 workspace $ws38
+        bindsym $mod+9 workspace $ws39
+        bindsym $mod+0 workspace $ws30
+    
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+        bindsym space mode "default"
+        bindsym BackSpace mode "default"
+    }
+    bindsym 4 mode "$mode_workspace_selection_4 {
+    }
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+    bindsym space mode "default"
+    bindsym BackSpace mode "default"
+}
+
+bindsym $mod+w mode "$mode_workspace_selection_0"
+

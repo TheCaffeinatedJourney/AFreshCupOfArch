@@ -1,0 +1,22 @@
+
+#############################################################################
+###   modes                                                               ###
+#############################################################################
+
+# applicaiton launcher
+set $mode_launcher Launch  [f]irefox | [b]itwarden | [v]mware | [c]alculator | [t]hunar
+mode "$mode_launcher" {     
+        bindsym f exec --no-startup-id firefox, mode "default"
+        bindsym b exec --no-startup-id bitwarden-desktop, mode "default"
+        bindsym v workspace --no-auto-back-and-forth $ws11, exec --no-startup-id "killall vmware-view; i3-move-workspaces-to-primary && vmware-view", mode "default"
+        bindsym c exec gnome-calculator, mode "default"
+        bindsym t exec thunar, mode "default"
+        # back to normal: Enter, Escape, Space, Backspace
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+        bindsym space mode "default"
+        bindsym BackSpace mode "default"
+}
+# launcher
+bindsym $mod+o mode "$mode_launcher"
+

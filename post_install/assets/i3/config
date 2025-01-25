@@ -1,0 +1,141 @@
+# i3 config file (v4)
+
+# To regenerate a default file, backup or delete this file and run i3-config-wizard(1).
+
+# Please see https://i3wm.org/docs/userguide.html for a complete reference!
+# https://i3wm.org/docs/userguide.html#configuring for config options
+
+#############################################################################
+###   included files                                                      ###
+###       additional configuration files are stored in config.d           ###
+###       modes and menus are in config.d/modes                           ###
+###       hardware (such as mouse bindings, etc. are in config.d/hardware ###
+###       machine specific are in a directory that shares the             ###
+###           hostname of the machine                                     ### 
+#############################################################################
+include $HOME/.config/i3/config.d/*.conf
+include $HOME/.config/i3/config.d/modes/*.conf
+include $HOME/.config/i3/config.d/hardware/*.conf
+include $HOME/.config/i3/config.d/`hostnamectl hostname`/*.conf
+
+
+#############################################################################
+###   set modifier key                                                    ###
+#############################################################################
+set $mod Mod4
+
+
+#############################################################################
+###   set fonts                                                           ###
+#############################################################################
+# i3 has support for both X core fonts and FreeType fonts (through Pango) to render window titles.
+#
+# To generate an X core font description, you can use xfontsel(1). To see special characters (Unicode), you need to use a font which supports the ISO-10646 encoding.
+#
+#Syntax:
+#
+#font <X core font description>
+#font pango:<family list> [<style options>] <size>
+
+font pango:JetBrainsMono Nerd Font Regular 8
+
+
+#############################################################################
+###   config variables                                                    ###
+###   	variables can be read from included files, but variables defined  ###
+###	in the included files cannot be read from the sourcing file       ###
+#############################################################################
+
+### workspaces
+set $ws1 "1: " 
+set $ws2 "2: " 
+set $ws3 "3: " 
+set $ws4 "4: " 
+set $ws5 "5: " 
+set $ws6 "6: " 
+set $ws7 "7: " 
+set $ws8 "8: 󰟐" 
+set $ws9 "9: " 
+set $ws10 "10:  " 
+set $ws11 "VM: 󰎤󰎩"
+set $ws12 "VM: 󰎦󰎧"
+set $ws13 "VM:  "
+
+### monitors
+#set $monitor_laptop "eDP-1"
+#set $monitor_left_DP1  "DP-1-1"
+#set $monitor_center_DP1 "DP-1-2"
+#set $monitor_right_DP1 "DP-1-3"
+#set $monitor_left_DP2  "DP-2-1"
+#set $monitor_center_DP2 "DP-2-2"
+#set $monitor_right_DP2 "DP-2-3"
+### ~2024-11-01: xrandr output changed from eDP-1, DP-1-1, etc. to eDP1, DP1-1, etc.
+set $monitor_laptop "eDP1"
+set $monitor_left_DP1  "DP1-1"
+set $monitor_center_DP1 "DP1-2"
+set $monitor_right_DP1 "DP1-3"
+set $monitor_left_DP2  "DP2-1"
+set $monitor_center_DP2 "DP2-2"
+set $monitor_right_DP2 "DP2-3"
+
+### gaps
+set $inner_gap 10
+set $top_gap 0
+set $bottom_gap 0 
+set $horizontal_gap 0
+set $gap_adjustment 5
+
+# lock script
+set $i3lockscript screenlock.sh
+
+
+#############################################################################
+###   color variables                                                     ###
+#############################################################################
+
+### color classes
+# focused           A client which currently has the focus
+# unfocused         A client which is not the focused on of its container, i.e. tabbed/stacked windows that are not focused
+# focused_inactive  A client which is the focused one of its container, but does not have the focus at the moment
+# urgent            A client which has its urgency hint activated
+# placeholder       Background and text color are used to draw placeholder window contents (when restoring layouts). Border and indicator are ignored.
+# background        Background color which will be used to paint the background of the client window on top of which the client will be rendered.  Only clients which do not cover the whole area of this window expose the color.
+
+### class properties
+# border            two thin lines above the titlebar
+# background        
+# text              
+# indicator         indicates where a new window will be opened 
+# child_border      color around the child window
+
+###colors
+set $focused-border                 #48463F
+set $focused-background             #282828
+set $focused-text                   #FBF1C7
+set $focused-indicator              #3C3836 
+set $focused-child_border           #282828
+
+set $unfocused-border               #282828
+set $unfocused-background           #3C3836
+set $unfocused-text                 #969077
+set $unfocused-indicator            #282828
+set $unfocused-child_border         #282828
+
+set $focused_inactive-border        #282828
+set $focused_inactive-background    #282828
+set $focused_inactive-text          #FBF1C7
+set $focused_inactive-indicator     #282828
+set $focused_inactive-child_border  #282828
+
+set $urgent-border                  #CC241D
+set $urgent-background              #282828
+set $urgent-text                    #FBF1C7
+set $urgent-indicator               #CC241D
+set $urgent-child_border            #CC241D
+
+set $placeholder-background         #282828
+set $placeholder-text               #FBF1C7
+set $placeholder-child_border       #000000
+
+set $background                     #282828
+

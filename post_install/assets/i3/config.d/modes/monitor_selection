@@ -1,0 +1,25 @@
+
+#############################################################################
+###   modes                                                               ###
+#############################################################################
+
+### Monitors
+set $mode_monitor_setup Monitors  (1) Laptop Only, (2) DP1, (3) DP2, (m) (f)orce First Detected  
+mode "$mode_monitor_setup" {
+        # l or 1 - load laptop profile
+        bindsym l exec --no-startup-id autorandr --force -l 90-laptop, mode "default"
+        bindsym 1 exec --no-startup-id autorandr --force -l 90-laptop, mode "default"
+        # 2 and 3 - load DP1 or DP2 profiles
+        bindsym 2 exec --no-startup-id autorandr --force -l 20-dock_triple_monitor_DP1, mode "default"
+        bindsym 3 exec --no-startup-id autorandr --force -l 21-dock_triple_monitor_DP2, mode "default"
+        #  m or f - force load first detected profile
+        bindsym m exec --no-startup-id autorandr --force --change, mode "default"
+        bindsym f exec --no-startup-id autorandr --force --change, mode "default"
+
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+        bindsym space mode "default"
+        bindsym BackSpace mode "default"
+}
+# Monitor setup
+bindsym $mod+m mode "$mode_monitor_setup"

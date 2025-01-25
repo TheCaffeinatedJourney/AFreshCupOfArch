@@ -296,6 +296,16 @@ install_xorg() {
     echo ""
 }
 
+install_i3() {
+    echo "Installing i3 windown manager..."
+    pacman -S --noconfirm i3-wm i3lock i3status dmenu picom polybar
+    # NEED TO APPLY THIS TO SPECIFIC USERS, NOT JUST ROOT 
+    cp "$project_root/assets/i3" "$HOME/.config/"
+    cp "$project_root/assets/i3status" "$HOME/.config/"
+    echo ""
+}
+
+
 configure_networkmanager
 set_ntp
 configure_reflector
@@ -317,3 +327,4 @@ install_pacman-contrib
 install_applets
 install_firefox
 install_xorg
+install_i3
