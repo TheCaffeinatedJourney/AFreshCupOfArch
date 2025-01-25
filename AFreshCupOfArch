@@ -745,6 +745,16 @@ EOF
     echo ""
 }
 
+clean_chroot() {
+    local tmp_dir="$chroot_dir$chroot_tmp_dir"
+    # shred these insteead of just removing, may contain passwords
+    shred -vu "$tmp_dir"
+    echo "Securely removed $temp_dir with shred"
+    echo ""
+}
+
+
+
 unmount_filesystems() {
     umount -R "$chroot_dir"
     echo ""
