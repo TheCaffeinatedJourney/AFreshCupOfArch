@@ -1,0 +1,18 @@
+#!/bin/bash
+set -euo pipefail
+
+hostname=""
+processor_model=""
+lvm_partition=""
+volume_group=""
+default_kernel=""
+physical_volume=""
+root_secret=""
+is_vm=""
+
+
+
+main() {
+}
+
+main
