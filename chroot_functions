@@ -136,6 +136,9 @@ generate_initramfs() {
     echo ""
 }
 
+get_uuid() {
+    blkid -s UUID -o value "$1"
+}
 
 
 main() {
