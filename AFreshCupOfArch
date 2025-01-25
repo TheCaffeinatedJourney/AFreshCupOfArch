@@ -549,6 +549,21 @@ mount_filesystems() {
     echo ""
 }
 
+update_parallel_downloads() {
+    local pacman_conf="/etc/pacman.conf"
+    local new_value="ParallelDownloads = 10"
+
+    # Update or add the ParallelDownloads setting
+    sed -i -E \
+        -e "s|^#?ParallelDownloads *= *[0-9]+|$new_value|" \
+        -e "/^#?ParallelDownloads/!b; t; a$new_value" \
+        "$pacman_conf"
+
+    echo "Updated ParallelDownloads to 10 in $pacman_conf."
+    echo ""
+}
+
+
 
 pacstrap_packages() {
     local prefix="$1"
