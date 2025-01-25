@@ -223,6 +223,42 @@ set_root_password() {
 }
 
 
+enable_vboxservice() {
+
+    # Check if running in a virtual machine
+    if systemd-detect-virt; then
+        virt_type=$(systemd-detect-virt)
+
+        echo "Detected virtual machine: $virt_type"
+
+        if [[ "$virt_type" == "oracle" || "$virt_type" == "vbox" ]]; then
+            echo "Running in VirtualBox. Checking for virtualbox-guest-utils package..."
+
+            # Check if the package is installed
+            if ! pacman -Qi virtualbox-guest-utils &> /dev/null; then
+                echo "virtualbox-guest-utils not installed. Installing now..."
+                pacman -S --noconfirm virtualbox-guest-utils
+            else
+                echo "virtualbox-guest-utils already installed."
+            fi
+
+            # Enable the vboxservice service
+            echo "Enabling vboxservice..."
+            systemctl enable vboxservice
+
+            # Blacklist the vmwgfx driver
+            echo "Blacklisting the vmwgfx driver..."
+            echo "blacklist vmwgfx" > /etc/modprobe.d/blacklist-vmwgfx.conf
+
+            echo "Configuration complete."
+        else
+            echo "Not running in VirtualBox. No action required."
+        fi
+    else
+        echo "Not running in a virtual machine."
+    fi
+}
+
 
 main() {
     set_time
@@ -235,6 +271,9 @@ main() {
     generate_initramfs
     configure_systemd-boot
     set_root_password
+    if [[ $is_vm == "true" ]]; then
+        enable_vboxservice
+    fi
 }
 
 main
